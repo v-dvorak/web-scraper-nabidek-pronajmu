@@ -2,7 +2,7 @@
 
 A Python application that monitors new rental listings across popular Czech real estate websites.
 
-> **Note:** This project was originally developed [Jan Chaloupka](https://github.com/janchaloupka/web-scraper-nabidek-pronajmu).
+> **Note:** This project was originally developed by [Jan Chaloupka](https://github.com/janchaloupka/web-scraper-nabidek-pronajmu).
 
 You can customize which **apartment layouts (dispositions)** and **city** to search for by configuring the application at startup.
 

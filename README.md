@@ -25,7 +25,7 @@ You can customize which **apartment layouts (dispositions)** and **city** to sea
    ```bash
    pip install -r requirements.txt
    ```
-3. Create a local environment file `.env.local` and set all required parameters (at minimum: Discord token, target channel ID, and apartment dispositions).
+3. Create a local environment file `.env.local` and set all required parameters (at minimum: Discord token, target channel ID, and apartment dispositions), see [specs](#required).
 4. Run the application using:
    ```bash
    python3 -m src
@@ -40,7 +40,7 @@ The scraper doesn't need to run continuously. When restarted, it will only send 
 
 ## Configuration via Environment Variables
 
-All variables are located inside the [`.env`](.env) file. The user
+All variables are located inside the [`.env`](.env) file. The user should keep all private information inside the created `.env.local` file - namely Discord room IDs and bot token.
 
 ### Required
 

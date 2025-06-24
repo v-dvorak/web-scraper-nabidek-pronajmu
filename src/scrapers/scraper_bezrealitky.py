@@ -6,9 +6,9 @@ import json
 from abc import ABC as abstract
 from typing import ClassVar
 
-from disposition import Disposition
-from scrapers.scraper_base import ScraperBase
-from scrapers.rental_offer import RentalOffer
+from ..disposition import Disposition
+from ..scrapers import ScraperBase, RentalOffer
+from ..location import LocationBase
 import requests
 
 
@@ -23,7 +23,6 @@ class ScraperBezrealitky(ScraperBase):
     API: ClassVar[str] = "https://api.bezrealitky.cz/"
     OFFER_TYPE: ClassVar[str] = "PRONAJEM"
     ESTATE_TYPE: ClassVar[str] = "BYT"
-    BRNO: ClassVar[str] = "R438171"
 
     class Routes(abstract):
         GRAPHQL: ClassVar[str] = "graphql/"
@@ -42,8 +41,9 @@ class ScraperBezrealitky(ScraperBase):
         Disposition.FLAT_OTHERS: None,
     }
 
-    def __init__(self, dispositions: Disposition):
+    def __init__(self, dispositions: Disposition, location: LocationBase):
         super().__init__(dispositions)
+        self.LOCATION_ID = location(self).location_id
         self._read_config()
         self._patch_config()
 
@@ -56,7 +56,7 @@ class ScraperBezrealitky(ScraperBase):
             "estateType": self.ESTATE_TYPE,
             "offerType": self.OFFER_TYPE,
             "disposition": self.get_dispositions_data(),
-            "regionOsmIds": [self.BRNO],
+            "regionOsmIds": [self.LOCATION_ID],
         }
         self._config["variables"].update(match)
 

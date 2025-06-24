@@ -6,12 +6,11 @@ from time import time
 import discord
 from discord.ext import tasks
 
-from config import *
-from discord_logger import DiscordLogger
-from offers_storage import OffersStorage
-from scrapers.rental_offer import RentalOffer
-from scrapers_manager import create_scrapers, fetch_latest_offers
-
+from .config import *
+from .discord_logger import DiscordLogger
+from .offers_storage import OffersStorage
+from .scrapers import RentalOffer
+from .scrapers_manager import create_scrapers, fetch_latest_offers
 
 def get_current_daytime() -> bool: return datetime.now().hour in range(6, 22)
 
@@ -64,11 +63,11 @@ async def process_latest_offers():
                 url=offer.link,
                 description=offer.location,
                 timestamp=datetime.utcnow(),
-                color=offer.scraper.color
+                color=offer.scraper_type.color
             )
 
             embed.add_field(name="Cena", value=str(offer.price) + " Kč")
-            embed.set_author(name=offer.scraper.name, icon_url=offer.scraper.logo_url)
+            embed.set_author(name=offer.scraper_type.name, icon_url=offer.scraper_type.logo_url)
             embed.set_image(url=offer.image_url)
 
             await channel.send(embed=embed)
@@ -95,5 +94,15 @@ if __name__ == "__main__":
         datefmt='%Y-%m-%d %H:%M:%S')
 
     logging.debug("Running in debug mode")
+
+    from .location import BrnoLocation, PrahaLocation
+    from .scrapers import ScraperBezrealitky, ScraperEuroBydleni
+    bl = BrnoLocation()
+    scp = ScraperBezrealitky([], bl)
+    print(bl(scp).location_id)
+    scp = ScraperEuroBydleni(config.dispositions, PrahaLocation())
+    for offer in scp.get_latest_offers():
+        print(offer.link)
+    exit()
 
     client.run(config.discord.token, log_level=logging.INFO)

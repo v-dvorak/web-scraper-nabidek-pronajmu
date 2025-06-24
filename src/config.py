@@ -6,7 +6,7 @@ from pathlib import Path
 import environ
 from dotenv import load_dotenv
 
-from disposition import Disposition
+from .disposition import Disposition
 
 load_dotenv(".env")
 
@@ -29,8 +29,10 @@ _str_to_disposition_map = {
     "others": Disposition.FLAT_OTHERS
 }
 
+
 def dispositions_converter(raw_disps: str):
-    return functools.reduce(operator.or_, map(lambda d: _str_to_disposition_map[d], raw_disps.split(",")), Disposition.NONE)
+    return functools.reduce(operator.or_, map(lambda d: _str_to_disposition_map[d], raw_disps.split(",")),
+                            Disposition.NONE)
 
 
 @environ.config(prefix="")
@@ -48,5 +50,6 @@ class Config:
         dev_channel = environ.var(converter=int)
 
     discord: Discord = environ.group(Discord)
+
 
 config: Config = Config.from_environ()

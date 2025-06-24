@@ -4,10 +4,10 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from disposition import Disposition
-from scrapers.rental_offer import RentalOffer
-from scrapers.scraper_base import ScraperBase
-from scrapers.rental_offer import RentalOffer
+from ..disposition import Disposition
+from .rental_offer import RentalOffer
+from .scraper_base import ScraperBase
+from .rental_offer import RentalOffer
 import requests
 from bs4 import BeautifulSoup
 

@@ -3,9 +3,9 @@ from typing import Any
 
 from requests import Response
 
-from disposition import Disposition
-from scrapers.rental_offer import RentalOffer
-from utils import flatten
+from ..disposition import Disposition
+from .rental_offer import RentalOffer
+from ..utils import flatten
 
 
 class ScraperBase():

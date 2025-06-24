@@ -6,13 +6,13 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
-from disposition import Disposition
-from scrapers.rental_offer import RentalOffer
-from scrapers.scraper_base import ScraperBase
-from scrapers.rental_offer import RentalOffer
+from ..disposition import Disposition
+from .rental_offer import RentalOffer
+from .scraper_base import ScraperBase
+from .rental_offer import RentalOffer
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
-
+from ..location import LocationBase, EuroBydleniLocationImpl
 
 class ScraperEuroBydleni(ScraperBase):
 
@@ -35,6 +35,9 @@ class ScraperEuroBydleni(ScraperBase):
         Disposition.FLAT_OTHERS: (14, 857), # (Garsonka, Apartman)
     }
 
+    def __init__(self, dispositions: Disposition, location: LocationBase):
+        super().__init__(dispositions)
+        self._LOCATION_DATA: EuroBydleniLocationImpl = location(self)
 
     def build_response(self) -> requests.Response:
         request_data = {
@@ -47,16 +50,16 @@ class ScraperEuroBydleni(ScraperBase):
             "sql[usable_area_max]": "",
             "sql[estate_area_min]": "",
             "sql[estate_area_max]": "",
-            "sql[locality][locality][input]": "Brno, Česko",
-            "sql[locality][locality][city]": "Brno, Česko",
+            "sql[locality][locality][input]": self._LOCATION_DATA.input,
+            "sql[locality][locality][city]": self._LOCATION_DATA.city,
             "sql[locality][locality][zip_code]": "",
             "sql[locality][locality][types]": "locality",
-            "sql[locality][location][lat]": "49.1950602",
-            "sql[locality][location][lng]": "16.6068371",
-            "sql[locality][viewport][south]": "49.10965517428777",
-            "sql[locality][viewport][west]": "16.42806782678905",
-            "sql[locality][viewport][north]": "49.294484956308",
-            "sql[locality][viewport][east]": "16.72785321479357",
+            "sql[locality][location][lat]": self._LOCATION_DATA.lat,
+            "sql[locality][location][lng]": self._LOCATION_DATA.lng,
+            "sql[locality][viewport][south]": self._LOCATION_DATA.south,
+            "sql[locality][viewport][west]": self._LOCATION_DATA.west,
+            "sql[locality][viewport][north]": self._LOCATION_DATA.north,
+            "sql[locality][viewport][east]": self._LOCATION_DATA.east,
             "sql[poptavka][jmeno]": "",
             "sql[poptavka][prijmeni]": "",
             "sql[poptavka][email]": "",

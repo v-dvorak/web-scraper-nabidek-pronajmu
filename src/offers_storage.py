@@ -1,6 +1,6 @@
 import os
 
-from scrapers.rental_offer import RentalOffer
+from .scrapers import RentalOffer
 
 
 class OffersStorage:
@@ -23,7 +23,6 @@ class OffersStorage:
         except FileNotFoundError:
             self.first_time = True
 
-
     def contains(self, offer: RentalOffer) -> bool:
         """Objevila se nabídka již dříve?
 
@@ -34,7 +33,6 @@ class OffersStorage:
             bool: Jde o starou nabídku
         """
         return offer.link in self._links
-
 
     def save_offers(self, offers: list[RentalOffer]):
         """Uložit nabídky jako nalezené

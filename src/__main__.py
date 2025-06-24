@@ -72,7 +72,7 @@ async def process_latest_offers():
             embed.add_field(name="Cena", value=f"{offer.price} Kč")
             embed.add_field(name="Služby", value=f"{offer.true_utilities} Kč")
             embed.add_field(name="Dispozice", value=f"{offer.disposition}")
-            embed.add_field(name="Velikost", value=f"{offer.disposition} m²")
+            embed.add_field(name="Velikost", value=f"{offer.size} m²")
 
             embed.set_author(name=offer.scraper.name, icon_url=offer.scraper.logo_url)
             embed.set_image(url=offer.image_url)

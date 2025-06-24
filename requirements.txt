@@ -1,5 +1,5 @@
-requests
-beautifulsoup4
-python-dotenv
-discord.py
-environ-config
+beautifulsoup4==4.13.4
+discord.py==2.5.2
+environ-config==24.1.0
+python-dotenv==1.1.1
+requests==2.32.4

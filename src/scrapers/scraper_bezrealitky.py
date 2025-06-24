@@ -41,9 +41,9 @@ class ScraperBezrealitky(ScraperBase):
         Disposition.FLAT_OTHERS: None,
     }
 
-    def __init__(self, dispositions: Disposition, location: LocationBase):
-        super().__init__(dispositions)
-        self.LOCATION_ID = location(self).location_id
+    def __init__(self, disposition: Disposition, location: LocationBase):
+        super().__init__(disposition)
+        self._LOCATION_ID: str = location(self).location_id
         self._read_config()
         self._patch_config()
 
@@ -56,7 +56,7 @@ class ScraperBezrealitky(ScraperBase):
             "estateType": self.ESTATE_TYPE,
             "offerType": self.OFFER_TYPE,
             "disposition": self.get_dispositions_data(),
-            "regionOsmIds": [self.LOCATION_ID],
+            "regionOsmIds": [self._LOCATION_ID],
         }
         self._config["variables"].update(match)
 

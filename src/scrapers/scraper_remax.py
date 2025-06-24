@@ -6,10 +6,10 @@ import requests
 from bs4 import BeautifulSoup
 
 from ..disposition import Disposition
-from .rental_offer import RentalOffer
 from .scraper_base import ScraperBase
 from .rental_offer import RentalOffer
 from urllib.parse import urljoin
+from ..location import LocationBase, PrahaLocation, RemaxLocationImpl
 from bs4 import BeautifulSoup
 
 
@@ -19,6 +19,7 @@ class ScraperRemax(ScraperBase):
     logo_url = "https://www.remax-czech.cz/apple-touch-icon.png"
     color = 0x003DA5
     base_url = "https://www.remax-czech.cz/reality/vyhledavani/"
+    region_base_url = "https://www.remax-czech.cz/reality/"
 
     disposition_mapping = {
         Disposition.FLAT_1KK: "&types%5B4%5D%5B2%5D=on",
@@ -43,9 +44,18 @@ class ScraperRemax(ScraperBase):
         ),
     }
 
+    def __init__(self, dispositions: Disposition, location: LocationBase):
+        super().__init__(dispositions)
+        self._LOCATION_DATA: RemaxLocationImpl = location(self)
 
     def build_response(self) -> requests.Response:
-        url = self.base_url + "?regions%5B116%5D%5B3702%5D=on&sale=2"
+        # Prague is implemented not as a city but as a region.
+        if self._LOCATION_DATA.is_region:
+            url = self.region_base_url + self._LOCATION_DATA.location_id + "/?"
+        else:
+            url = self.base_url + f"?regions{self._LOCATION_DATA.location_id}=on"
+
+        url += "&sale=2"
         url += "".join(self.get_dispositions_data())
         url += "&order_by_published_date=0"
 

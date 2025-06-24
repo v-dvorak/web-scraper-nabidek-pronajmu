@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+
 from ..location_base import ScraperLocationImpl
+
 
 @dataclass
 class EuroBydleniLocationImpl(ScraperLocationImpl):

@@ -1,26 +1,27 @@
 import logging
 import traceback
 
-from .location import BrnoLocation
 from .disposition import Disposition
+from .location import PrahaLocation, BrnoLocation, LocationBase
 from .scrapers import (RentalOffer, ScraperBase, ScraperBravis, ScraperEuroBydleni, ScraperIdnesReality,
                        ScraperRealcity, ScraperRealingo, ScraperRemax, ScraperSreality, ScraperUlovDomov,
                        ScraperBezrealitky)
 
 
-def create_scrapers(dispositions: Disposition) -> list[ScraperBase]:
-    location = None
+def create_scrapers(dispositions: Disposition, location: LocationBase = None) -> list[ScraperBase]:
+    if location is None:
+        location = PrahaLocation()
     return [
         # Bravis is Brno based
         *([ScraperBravis(dispositions)] if isinstance(location, BrnoLocation) else []),
-        ScraperEuroBydleni(dispositions, BrnoLocation()),
-        ScraperIdnesReality(dispositions),
-        ScraperRealcity(dispositions),
-        ScraperRealingo(dispositions),
-        ScraperRemax(dispositions),
-        ScraperSreality(dispositions),
-        ScraperUlovDomov(dispositions),
-        ScraperBezrealitky(dispositions, BrnoLocation()),
+        ScraperEuroBydleni(dispositions, location),
+        ScraperIdnesReality(dispositions, location),
+        ScraperRealcity(dispositions, location),
+        ScraperRealingo(dispositions, location),
+        ScraperRemax(dispositions, location),
+        ScraperSreality(dispositions, location),
+        ScraperUlovDomov(dispositions, location),
+        ScraperBezrealitky(dispositions, location),
     ]
 
 

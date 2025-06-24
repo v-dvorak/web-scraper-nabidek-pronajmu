@@ -1,5 +1,5 @@
 from ..location_base import LocationBase, ScraperLocationImpl
-from ..scraper_location_impl import BezrealitkyLocationImpl, EuroBydleniLocationImpl
+from ..scraper_location_impl import *
 
 
 class BrnoLocation(LocationBase):
@@ -14,11 +14,22 @@ class BrnoLocation(LocationBase):
             EuroBydleniLocationImpl(
                 "Brno, Česko",
                 "Brno, Česko",
-                "49.1950602",
-                "16.6068371",
-                "49.10965517428777",
-                "16.42806782678905",
-                "49.294484956308",
-                "16.72785321479357",
+                "49.195060",
+                "16.606837",
+                "49.109655",
+                "16.428068",
+                "49.294485",
+                "16.727853",
+            ),
+            IdnesRealityLocationImpl("brno-mesto"),
+            RealcityLocationImpl("brno-mesto-68"),
+            RealingoLocationImpl("Brno"),
+            RemaxLocationImpl("[116][3702]", False),
+            SrealityLocationImpl("72", "14"),
+            UlovDomovLocationImpl(
+                "49.294485",
+                "16.727853",
+                "49.109655",
+                "16.428068"
             )
         ]

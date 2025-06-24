@@ -4,15 +4,13 @@ from urllib.parse import urljoin
 
 import requests
 
-from ..disposition import Disposition
 from .rental_offer import RentalOffer
 from .scraper_base import ScraperBase
-from .rental_offer import RentalOffer
-import requests
+from ..disposition import Disposition
+from ..location import LocationBase
 
 
 class ScraperRealingo(ScraperBase):
-
     name = "realingo"
     logo_url = "https://www.realingo.cz/_next/static/media/images/android-chrome-144x144-cf1233ce.png"
     color = 0x00BC78
@@ -31,6 +29,9 @@ class ScraperRealingo(ScraperBase):
         Disposition.FLAT_OTHERS: "OTHERS_FLAT",
     }
 
+    def __init__(self, dispositions: Disposition, location: LocationBase):
+        super().__init__(dispositions)
+        self._LOCATION_NAME: str = location(self).location_name
 
     def build_response(self) -> requests.Response:
         json_request = {
@@ -39,7 +40,7 @@ class ScraperRealingo(ScraperBase):
             "variables": {
                 "purpose": "RENT",
                 "property": "FLAT",
-                "address": "Brno",
+                "address": self._LOCATION_NAME,
                 "saved": False,
                 "categories": self.get_dispositions_data(),
                 "sort": "NEWEST",
@@ -51,7 +52,6 @@ class ScraperRealingo(ScraperBase):
         logging.debug("realingo request: %s", json.dumps(json_request))
 
         return requests.post(self.base_url, headers=self.headers, json=json_request)
-
 
     def category_to_string(self, id) -> str:
         return {
@@ -92,7 +92,6 @@ class ScraperRealingo(ScraperBase):
             "OTHERS_MONUMENTS": "Ostatn\xed"
         }.get(id, "")
 
-
     def get_latest_offers(self) -> list[RentalOffer]:
         response = self.build_response().json()
 
@@ -100,12 +99,12 @@ class ScraperRealingo(ScraperBase):
 
         for offer in response["data"]["searchOffer"]["items"]:
             items.append(RentalOffer(
-                scraper = self,
-                link = urljoin(self.base_url, offer["url"]),
-                title = self.category_to_string(offer["category"]) + ", " + str(offer["area"]["main"]) + " m²",
-                location = offer["location"]["address"],
-                price = offer["price"]["total"],
-                image_url = urljoin(self.base_url, "/static/images/" + (offer["photos"]["main"] or ""))
+                scraper=self,
+                link=urljoin(self.base_url, offer["url"]),
+                title=self.category_to_string(offer["category"]) + ", " + str(offer["area"]["main"]) + " m²",
+                location=offer["location"]["address"],
+                price=offer["price"]["total"],
+                image_url=urljoin(self.base_url, "/static/images/" + (offer["photos"]["main"] or ""))
             ))
 
         return items

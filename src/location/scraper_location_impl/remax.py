@@ -4,10 +4,11 @@ from ..location_base import ScraperLocationImpl
 
 
 @dataclass(frozen=True)
-class BezrealitkyLocationImpl(ScraperLocationImpl):
+class RemaxLocationImpl(ScraperLocationImpl):
     location_id: str
+    is_region: bool
 
     @property
     def scraper_type(self):
-        from ...scrapers import ScraperBezrealitky
-        return ScraperBezrealitky
+        from ...scrapers import ScraperRemax
+        return ScraperRemax

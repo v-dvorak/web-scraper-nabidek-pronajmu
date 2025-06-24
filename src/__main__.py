@@ -89,18 +89,22 @@ async def process_latest_offers():
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=(logging.DEBUG if config.debug else logging.INFO),
+        # level=(logging.DEBUG if config.debug else logging.INFO),
+        level=(logging.DEBUG),
         format='%(asctime)s - [%(levelname)s] %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S')
 
     logging.debug("Running in debug mode")
 
     from .location import BrnoLocation, PrahaLocation
-    from .scrapers import ScraperBezrealitky, ScraperEuroBydleni
+    from .scrapers import *
     bl = BrnoLocation()
     scp = ScraperBezrealitky([], bl)
     print(bl(scp).location_id)
-    scp = ScraperEuroBydleni(config.dispositions, PrahaLocation())
+    scp = ScraperRealingo(config.dispositions, BrnoLocation())
+    scp = ScraperRemax(config.dispositions, BrnoLocation())
+    scp = ScraperUlovDomov(config.dispositions, BrnoLocation())
+    # print(scp._LOCATION_ID)
     for offer in scp.get_latest_offers():
         print(offer.link)
     exit()

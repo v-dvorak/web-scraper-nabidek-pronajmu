@@ -3,15 +3,13 @@ import logging
 
 import requests
 
-from ..disposition import Disposition
 from .rental_offer import RentalOffer
 from .scraper_base import ScraperBase
-from .rental_offer import RentalOffer
-import requests
+from ..disposition import Disposition
+from ..location import LocationBase, UlovDomovLocationImpl
 
 
 class ScraperUlovDomov(ScraperBase):
-
     name = "UlovDomov"
     logo_url = "https://www.ulovdomov.cz/favicon.png"
     color = 0xFFFFFF
@@ -26,10 +24,13 @@ class ScraperUlovDomov(ScraperBase):
         Disposition.FLAT_3: 7,
         Disposition.FLAT_4KK: 8,
         Disposition.FLAT_4: 9,
-        Disposition.FLAT_5_UP: (10, 11, 12, 13, 14, 15), # 5kk, 5+1, 6kk, 6+1, 7kk, 7+1
+        Disposition.FLAT_5_UP: (10, 11, 12, 13, 14, 15),  # 5kk, 5+1, 6kk, 6+1, 7kk, 7+1
         Disposition.FLAT_OTHERS: 16,
     }
 
+    def __init__(self, dispositions: Disposition, location: LocationBase):
+        super().__init__(dispositions)
+        self._LOCATION_DATA: UlovDomovLocationImpl = location(self)
 
     def disposition_id_to_string(self, id) -> str:
         return {
@@ -67,12 +68,12 @@ class ScraperUlovDomov(ScraperBase):
             "banner_panel_width_type": 480,
             "bounds": {
                 "north_east": {
-                    "lat": 49.294485,
-                    "lng": 16.727853
+                    "lat": self._LOCATION_DATA.north_east_lat,
+                    "lng": self._LOCATION_DATA.north_east_lng,
                 },
                 "south_west": {
-                    "lat": 49.109655,
-                    "lng": 16.428068
+                    "lat": self._LOCATION_DATA.south_west_lat,
+                    "lng": self._LOCATION_DATA.south_west_lng,
                 }
             },
             "conveniences": [],
@@ -99,13 +100,15 @@ class ScraperUlovDomov(ScraperBase):
         items: list[RentalOffer] = []
         for offer in response["offers"]:
             items.append(RentalOffer(
-                scraper = self,
-                link = offer["absolute_url"],
+                scraper=self,
+                link=offer["absolute_url"],
                 # TODO "Pronájem" podle ID?
-                title = "Pronájem " + self.disposition_id_to_string(offer["disposition_id"]) + " " + str(offer["acreage"]) + " m²",
-                location = offer["street"]["label"] + ", " + offer["village"]["label"] + " - " + offer["village_part"]["label"],
-                price = offer["price_rental"],
-                image_url = offer["photos"][0]["path"]
+                title="Pronájem " + self.disposition_id_to_string(offer["disposition_id"]) + " " + str(
+                    offer["acreage"]) + " m²",
+                location=offer["street"]["label"] + ", " + offer["village"]["label"] + " - " + offer["village_part"][
+                    "label"],
+                price=offer["price_rental"],
+                image_url=offer["photos"][0]["path"]
             ))
 
         return items

@@ -8,6 +8,7 @@ from ..disposition import Disposition
 from .rental_offer import RentalOffer
 from .scraper_base import ScraperBase
 from .rental_offer import RentalOffer
+from ..location import IdnesRealityLocationImpl, LocationBase
 import requests
 from bs4 import BeautifulSoup
 
@@ -35,9 +36,13 @@ class ScraperIdnesReality(ScraperBase):
         Disposition.FLAT_OTHERS: "s-qc%5BsubtypeFlat%5D%5B%5D=atypical", # atyp
     }
 
+    def __init__(self, dispositions: Disposition, location: LocationBase):
+        super().__init__(dispositions)
+        self._LOCATION_NAME: str = location(self).location_name
+
 
     def build_response(self) -> requests.Response:
-        url = "https://reality.idnes.cz/s/pronajem/byty/brno-mesto/?"
+        url = f"https://reality.idnes.cz/s/pronajem/byty/{self._LOCATION_NAME}/?"
         url += "&".join(self.get_dispositions_data())
 
         logging.debug("iDNES reality request: %s", url)

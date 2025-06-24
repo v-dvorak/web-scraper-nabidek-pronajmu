@@ -7,7 +7,8 @@ from bs4 import BeautifulSoup
 from ..disposition import Disposition
 from .rental_offer import RentalOffer
 from .scraper_base import ScraperBase
-from .rental_offer import RentalOffer
+from ..location import LocationBase
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -31,9 +32,12 @@ class ScraperRealcity(ScraperBase):
         Disposition.FLAT_OTHERS: ("%22atyp%22", "%22disp_nospec%22"), # atyp, unknown
     }
 
+    def __init__(self, dispositions: Disposition, location: LocationBase):
+        super().__init__(dispositions)
+        self._LOCATION_ID: str = location(self).location_id
 
     def build_response(self) -> requests.Response:
-        url = "https://www.realcity.cz/pronajem-bytu/brno-mesto-68/?sp=%7B%22locality%22%3A%5B68%5D%2C%22transactionTypes%22%3A%5B%22rent%22%5D%2C%22propertyTypes%22%3A%5B%7B%22propertyType%22%3A%22flat%22%2C%22options%22%3A%7B%22disposition%22%3A%5B"
+        url = f"https://www.realcity.cz/pronajem-bytu/{self._LOCATION_ID}?sp=%7B%22locality%22%3A%5B{self._LOCATION_ID.split('-')[-1]}%5D%2C%22transactionTypes%22%3A%5B%22rent%22%5D%2C%22propertyTypes%22%3A%5B%7B%22propertyType%22%3A%22flat%22%2C%22options%22%3A%7B%22disposition%22%3A%5B"
         url += "%2C".join(self.get_dispositions_data())
         url += "%5D%7D%7D%5D%7D"
 

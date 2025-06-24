@@ -6,16 +6,13 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
-from ..disposition import Disposition
 from .rental_offer import RentalOffer
 from .scraper_base import ScraperBase
-from .rental_offer import RentalOffer
-from urllib.parse import urljoin
-from bs4 import BeautifulSoup
+from ..disposition import Disposition
 from ..location import LocationBase, EuroBydleniLocationImpl
 
-class ScraperEuroBydleni(ScraperBase):
 
+class ScraperEuroBydleni(ScraperBase):
     name = "Eurobydlení"
     logo_url = "https://files.janchaloupka.cz/eurobydleni.png"
     color = 0xFA0F54
@@ -31,8 +28,8 @@ class ScraperEuroBydleni(ScraperBase):
         Disposition.FLAT_3KK: 20,
         Disposition.FLAT_4: 21,
         Disposition.FLAT_4KK: 22,
-        Disposition.FLAT_5_UP: (202, 256), # (5+1, 5kk)
-        Disposition.FLAT_OTHERS: (14, 857), # (Garsonka, Apartman)
+        Disposition.FLAT_5_UP: (202, 256),  # (5+1, 5kk)
+        Disposition.FLAT_OTHERS: (14, 857),  # (Garsonka, Apartman)
     }
 
     def __init__(self, dispositions: Disposition, location: LocationBase):
@@ -80,19 +77,18 @@ class ScraperEuroBydleni(ScraperBase):
 
         offers = soup.find(id="properties-box")
         for item in offers.find_all("li", {"class": "list-items__item"}):
-
             image_container = item.find("ul", {"class": "list-items__item__image__wrap"})
             content = item.find("div", {"class": "list-items__content__1"})
             title = content.find("h2", {"class": "list-items__item__title"})
             details = content.find_all("li")
 
             items.append(RentalOffer(
-                scraper = self,
-                link = urljoin(self.base_url, title.find("a").get('href')),
-                title = title.get_text().strip(),
-                location = details[1].get_text().strip(),
-                price = int(re.sub(r"[^\d]", "", details[0].get_text()) or "0"),
-                image_url = "https:" + image_container.find("img").get("src")
+                scraper=self,
+                link=urljoin(self.base_url, title.find("a").get('href')),
+                title=title.get_text().strip(),
+                location=details[1].get_text().strip(),
+                price=int(re.sub(r"[^\d]", "", details[0].get_text()) or "0"),
+                image_url="https:" + image_container.find("img").get("src")
             ))
 
         return items

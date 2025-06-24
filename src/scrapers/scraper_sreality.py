@@ -11,7 +11,7 @@ from .rental_offer import RentalOffer
 from time import time
 import requests
 from urllib.parse import urljoin
-
+from ..location import LocationBase, SrealityLocationImpl
 
 class ScraperSreality(ScraperBase):
 
@@ -97,7 +97,9 @@ class ScraperSreality(ScraperBase):
             36: "jine-nemovitosti"
         }
 
-
+    def __init__(self, dispositions: Disposition, location: LocationBase):
+        super().__init__(dispositions)
+        self._LOCATION_DATA: SrealityLocationImpl = location(self)
     def _create_link_to_offer(self, offer) -> str:
         return urljoin(self.base_url, "/detail" +
             "/" + self._category_type_to_url[offer["seo"]["category_type_cb"]] +
@@ -109,7 +111,8 @@ class ScraperSreality(ScraperBase):
     def build_response(self) -> requests.Response:
         url = self.base_url + "/api/cs/v2/estates?category_main_cb=1&category_sub_cb="
         url += "|".join(self.get_dispositions_data())
-        url += "&category_type_cb=2&locality_district_id=72&locality_region_id=14&per_page=20"
+        url += (f"&category_type_cb=2&locality_district_id={self._LOCATION_DATA.locality_district_id}"
+                f"&locality_region_id={self._LOCATION_DATA.locality_region_id}&per_page=20")
         url += "&tms=" + str(int(time()))
 
         logging.debug("Sreality request: %s", url)

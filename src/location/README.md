@@ -2,8 +2,6 @@
 
 This module allows the user to switch between already implemented locations and to define new, custom, locations.
 
-See the []()
-
 ## Supported locations
 
 - Prague
@@ -32,7 +30,7 @@ class MyCustomLocation(LocationBase):
 
 ### [BezRealitky](scraper_location_impl/bezrealitky.py)
 
-- Open [https://www.bezrealitky.cz/](https://www.bezrealitky.cz/), search for you location, find a location code inside the page's url under the name `regionOsmIds`.
+- Open [https://www.bezrealitky.cz/](https://www.bezrealitky.cz/), search for you location, find the location code inside the page's url under the name `regionOsmIds`.
 
 ### Bravis
 
@@ -84,4 +82,12 @@ class MyCustomLocation(LocationBase):
 - We need to retrieve region and district ID, we were not able to find any official documentation of these mappings.
 - Regions are easy - just search from `1` to `14`.
 - This should be visible somewhere in Network Requests, we were not able to locate it.
+
+### [Ulov Domov](scraper_location_impl/ulov_domov.py)
+
+- Again, we define a search area based on GPS coordinates:
+  - `north_east_lat`,
+  - `north_east_lng`,
+  - `south_west_lat`,
+  - `south_west_lng`.
 

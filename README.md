@@ -1,13 +1,13 @@
-# Web Scraper Nabídek Pronájmu
-Hlídá nové nabídky na populárních realitních serverech.
+# Rental Listings Web Scraper
 
-[**Docker image (aktuální z master větvě) - `janch32/web-scraper-nabidek-pronajmu`**](https://hub.docker.com/r/janch32/web-scraper-nabidek-pronajmu)
+A Python application that monitors new rental listings across popular Czech real estate websites.
 
-*Tato aplikace byla vytvořena pro osobní použití, takže obsahuje hardkódované údaje pro hledání pronájmu bytů v Brně (ale nemělo by být zas tak moc těžký to upravit).*
+> **Note:** This project was originally developed [Jan Chaloupka](https://github.com/janchaloupka/web-scraper-nabidek-pronajmu).
 
-Nicméně je možné při spuštění aplikace nakonfigurovat, které  **dispozice bytu** (počet místností) hledat.
+You can customize which **apartment layouts (dispositions)** and **city** to search for by configuring the application at startup.
 
-## Podporované realitní servery
+## Supported Real Estate Platforms
+
 - BRAVIS
 - EuroBydlení
 - iDNES Reality
@@ -18,27 +18,50 @@ Nicméně je možné při spuštění aplikace nakonfigurovat, které  **dispozi
 - UlovDomov
 - BezRealitky
 
-## Spuštění
-- Lze spustit lokálně nebo v Dockeru
-- **Lokální spuštění**
-    - Je vyžadován **Python 3.11+**
-    - Před prvním spuštěním nainstalujte závislosti `make install`
-    - Vytvořte si lokální soubor `.env.local` a nastavte v něm všechny požadované parametry (minimálně však Discord token, cílovou roomku a požadované dispozice bytu)
-    - následně je možné spustit `make run` nebo v debug režimu `make debug`
-- **Spuštění v Dockeru**
-    - Přiložená Docker Compose konfigurace souží pro vývoj. Stačí ji spustit příkazem `docker-compose up -d` (má zapnutý debug mód)
-    - K dispozici je také sestavený Docker obraz v Ducker Hub, vždy aktuální s master větví - [`janch32/web-scraper-nabidek-pronajmu`](https://hub.docker.com/r/janch32/web-scraper-nabidek-pronajmu)
-    - Kromě toho je možné vytvořit "produkční" Docker image díky `Dockerfile`. Při spuštění kontejneru je nutné nastavit všechny požadované env proměnné (ne v v .env.local!)
+## Getting Started
 
-Aplikace při prvním spuštění nevypíše žádné nabídky, pouze si stáhne seznam těch aktuálních. Poté každých 30 mint (nastavitelné přes env proměnné) kontroluje nové nabídky na realitních serverech a ty přeposílá do Discord kanálu. Aplikace nemusí běžet pořád, po opětovném spuštění pošle všechny nové nabídky od posledního spuštění.
+1. Python **3.11+** is required.
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Create a local environment file `.env.local` and set all required parameters (at minimum: Discord token, target channel ID, and apartment dispositions).
+4. Run the application using:
+   ```bash
+   python3 -m src
+   ```
 
-## Konfigurace přes Env proměnné
-- `DISCORD_OFFERS_CHANNEL` - Unikátní číslo Discord kanálu, kde se budou posílat nabídky. [Návod pro získání ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)
-- `DISCORD_DEV_CHANNEL` - Unikátní číslo Discord kanálu, kde se budou posílat chyby programu.
-- `DISCORD_TOKEN` - Obsahuje Discord token bota. [Návod pro získání tokenu](https://discordgsm.com/guide/how-to-get-a-discord-bot-token)
-- `DISPOSITIONS` - Obsahuje seznam dispozic oddělených čárkou. Např.: `DISPOSITIONS=2+kk,2+1,others`
+### How It Works
 
-### Seznam dostupných hodnot parametru `DISPOSITIONS`
+On the first run, the application fetches and stores all currently available listings but does **not** send them to Discord. It then checks for new listings every 30 minutes (or as configured via environment variables) and forwards only newly found listings to a Discord channel.
+
+The scraper doesn't need to run continuously. When restarted, it will only send new listings found since the last run.
+
+
+## Configuration via Environment Variables
+
+All variables are located inside the [`.env`](.env) file. The user
+
+### Required
+
+- `DISCORD_OFFERS_CHANNEL`: The ID of the Discord channel where offers will be sent.
+  [How to get channel ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-)
+
+- `DISCORD_DEV_CHANNEL`: The ID of the Discord channel for reporting errors.
+
+- `DISCORD_TOKEN`: Discord bot token.
+  [How to get a bot token](https://discordgsm.com/guide/how-to-get-a-discord-bot-token)
+
+- `DISPOSITIONS`: A comma-separated list of apartment dispositions to search for. Example:
+
+  ```
+  DISPOSITIONS=2+kk,2+1,others
+  ```
+
+You also need to invite you bot to your server, [adding bot a server tutorial](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links).
+
+### Supported Values for `DISPOSITIONS`
+
 - `1+kk`
 - `1+1`
 - `2+kk`
@@ -47,12 +70,23 @@ Aplikace při prvním spuštění nevypíše žádné nabídky, pouze si stáhne
 - `3+1`
 - `4+kk`
 - `4+1`
-- `5++` (5+kk a více místností)
-- `others` (jiné, atypické nebo neznámé velikosti)
+- `5++` – apartments with 5 or more rooms
+- `others` – non-standard, atypical, or unknown layouts
 
-### Další konfigurovatelné Env proměnné
-Tyto hodnoty jsou nastavené pro bězné použití a není potřeba ji měnit. Zde je každopádně popis těchto hodnot.
-- `DEBUG` (boolean, výchozí vypnuto). Aktivuje režim ladění aplikace, především podrobnějšího výpisu do konzole. Vhodné pro vývoj.
-- `FOUND_OFFERS_FILE` Cesta k souboru, kam se ukládají dříve nalezené nabídky. Aplikace si soubor vytvoří, ale složka musí existovat. Pokud aplikace nebyla nějakou dobu spuštěna (řádově týdny) je dobré tento soubor smazat - aplikace by toto vyhodnotila jako velké množství nových nabídek a zaspamovala by Discord kanál.
-- `REFRESH_INTERVAL_DAYTIME_MINUTES` - interval po který se mají stáhnout nejnovější nabídky Výchozí 30min, doporučeno minimálně 10min
-- `REFRESH_INTERVAL_NIGHTTIME_MINUTES` - noční interval stahování nabídek. Jde o čas mezi 22h-6h. Výchozí 90min, doporučeno vyšší než denní interval
+### Supported cities / locations
+
+- Prague
+- Brno
+
+More locations can be implemented by following the ["Implementing a new location"](src/location/README.md) tutorial.
+
+### Optional Environment Variables
+
+These are preconfigured for typical use but can be adjusted as needed:
+
+- `LOCATION`: Describes the location name that the configuration script will try to match. Default is `Praha`.
+- `MAXIMAL_RENT_VALUE`: The upper limit for when to send a message to discord about with the listing in CZK. If the true price (rent + utilities) exceeds this, the listing is discarded from further processing. Default is `25 000`.
+- `DEBUG`: Enables debug mode (default: off). Provides more verbose console output for development. Default is `off`.
+- `FOUND_OFFERS_FILE`: Path to the file where previously found listings are stored. The file will be created automatically, but the folder must already exist. If the scraper hasn't been run in a long time (e.g. weeks), it’s recommended to delete this file to avoid flooding the Discord channel with old listings. Default is `found_offers.txt`.
+- `REFRESH_INTERVAL_DAYTIME_MINUTES`: Fetch interval during the day. Default is `30` minutes, recommended minimum is `10` minutes.
+- `REFRESH_INTERVAL_NIGHTTIME_MINUTES`: Fetch interval during night hours (22:00–06:00). Default is `90` minutes. It's recommended to use a higher value than the daytime interval.

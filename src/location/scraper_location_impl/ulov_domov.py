@@ -12,5 +12,5 @@ class UlovDomovLocationImpl(ScraperLocationImpl):
 
     @property
     def scraper_type(self):
-        from ...scrapers import ScraperUlovDomov
+        from ...scrapers.impl import ScraperUlovDomov
         return ScraperUlovDomov

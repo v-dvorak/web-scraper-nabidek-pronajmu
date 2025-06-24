@@ -16,5 +16,5 @@ class EuroBydleniLocationImpl(ScraperLocationImpl):
 
     @property
     def scraper_type(self):
-        from ...scrapers import ScraperEuroBydleni
+        from ...scrapers.impl import ScraperEuroBydleni
         return ScraperEuroBydleni

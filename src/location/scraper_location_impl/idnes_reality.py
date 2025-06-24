@@ -9,5 +9,5 @@ class IdnesRealityLocationImpl(ScraperLocationImpl):
 
     @property
     def scraper_type(self):
-        from ...scrapers import ScraperIdnesReality
+        from ...scrapers.impl import ScraperIdnesReality
         return ScraperIdnesReality

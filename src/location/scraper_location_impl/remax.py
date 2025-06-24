@@ -10,5 +10,5 @@ class RemaxLocationImpl(ScraperLocationImpl):
 
     @property
     def scraper_type(self):
-        from ...scrapers import ScraperRemax
+        from ...scrapers.impl import ScraperRemax
         return ScraperRemax

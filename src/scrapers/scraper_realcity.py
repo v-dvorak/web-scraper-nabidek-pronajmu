@@ -54,13 +54,13 @@ class ScraperRealcity(ScraperBase):
         for item in soup.select("#rc-advertise-result .media.advertise.item"):
             image = item.find("div", "pull-left image")
             body = item.find("div", "media-body")
-
             items.append(RentalOffer(
                 scraper=self,
                 link="https://www.realcity.cz" + body.find("div", "title").a.get("href"),
                 title=body.find("div", "title").a.get_text() or "Chybí titulek",
                 location=body.find("div", "address").get_text().strip() or "Chybí adresa",
-                price=re.sub(r'\D+', '', body.find("div", "price").get_text() or "0"),
+                price=int(re.sub(r'\D+', '', body.find("div", "price").get_text() or "0")),
+                utilities=None,
                 image_url="https:" + image.img.get("src")
             ))
 

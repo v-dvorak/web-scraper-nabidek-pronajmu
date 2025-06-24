@@ -5,18 +5,16 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
-from ..disposition import Disposition
 from .rental_offer import RentalOffer
 from .scraper_base import ScraperBase
+from ..disposition import Disposition
 
 
 class ScraperBravis(ScraperBase):
-
     name = "BRAVIS"
     logo_url = "https://www.bravis.cz/content/img/logo-small.png"
     color = 0xCE0020
     base_url = "https://www.bravis.cz/pronajem-bytu"
-
 
     def build_response(self) -> requests.Response:
         url = self.base_url + "?"
@@ -51,12 +49,14 @@ class ScraperBravis(ScraperBase):
             params = item.select(".params > li")
 
             items.append(RentalOffer(
-                scraper = self,
-                link = urljoin(self.base_url, item.select_one("a.main").get("href")),
-                title = "Pronájem " + params[1].find("strong").get_text().strip() + ", " + params[2].find("strong").get_text().strip(),
-                location = item.select_one(".location").get_text().strip(),
-                price = int(re.sub(r"[^\d]", "", [text for text in item.select_one(".price").stripped_strings][0])),
-                image_url = urljoin(self.base_url, item.select_one(".img > img").get("src"))
+                scraper=self,
+                link=urljoin(self.base_url, item.select_one("a.main").get("href")),
+                title="Pronájem " + params[1].find("strong").get_text().strip() + ", " + params[2].find(
+                    "strong").get_text().strip(),
+                location=item.select_one(".location").get_text().strip(),
+                price=int(re.sub(r"[^\d]", "", [text for text in item.select_one(".price").stripped_strings][0])),
+                utilities=None,
+                image_url=urljoin(self.base_url, item.select_one(".img > img").get("src"))
             ))
 
         return items

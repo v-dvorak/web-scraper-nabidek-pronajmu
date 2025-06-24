@@ -9,5 +9,5 @@ class RealcityLocationImpl(ScraperLocationImpl):
 
     @property
     def scraper_type(self):
-        from ...scrapers import ScraperRealcity
+        from ...scrapers.impl import ScraperRealcity
         return ScraperRealcity

@@ -3,9 +3,9 @@ import traceback
 
 from .disposition import Disposition
 from .location import PrahaLocation, BrnoLocation, LocationBase
-from .scrapers import (RentalOffer, ScraperBase, ScraperBravis, ScraperEuroBydleni, ScraperIdnesReality,
-                       ScraperRealcity, ScraperRealingo, ScraperRemax, ScraperSreality, ScraperUlovDomov,
-                       ScraperBezrealitky)
+from .scrapers import RentalOffer, ScraperBase
+from .scrapers.impl import (ScraperBravis, ScraperEuroBydleni, ScraperIdnesReality, ScraperRealcity, ScraperRealingo,
+                            ScraperRemax, ScraperSreality, ScraperUlovDomov, ScraperBezrealitky)
 
 
 def create_scrapers(dispositions: Disposition, location: LocationBase = None) -> list[ScraperBase]:

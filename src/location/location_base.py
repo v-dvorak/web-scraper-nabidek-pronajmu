@@ -3,6 +3,7 @@ from typing import Self
 
 from ..scrapers import ScraperBase
 
+
 class ScraperLocationImpl(ABC):
     @property
     @abstractmethod
@@ -25,4 +26,3 @@ class LocationBase(ABC):
     @abstractmethod
     def name(self) -> str:
         pass
-

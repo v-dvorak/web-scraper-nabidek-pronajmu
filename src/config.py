@@ -7,6 +7,7 @@ import environ
 from dotenv import load_dotenv
 
 from .disposition import Disposition
+from .location import LocationBase
 
 load_dotenv(".env")
 
@@ -35,6 +36,14 @@ def dispositions_converter(raw_disps: str):
                             Disposition.NONE)
 
 
+def locations_converter(raw_location: str) -> LocationBase:
+    raw_location = raw_location.strip().lower()
+    for subc in LocationBase.__subclasses__():
+        if raw_location == subc.__name__.replace("Location", "").lower():
+            return subc()
+    raise ValueError(f"Location '{raw_location}' is not valid")
+
+
 @environ.config(prefix="")
 class Config:
     debug: bool = environ.bool_var()
@@ -42,6 +51,8 @@ class Config:
     refresh_interval_daytime_minutes: int = environ.var(converter=int)
     refresh_interval_nighttime_minutes: int = environ.var(converter=int)
     dispositions: Disposition = environ.var(converter=dispositions_converter)
+    maximal_rent_value: int = environ.var(converter=int)
+    location: LocationBase = environ.var(converter=locations_converter)
 
     @environ.config()
     class Discord:

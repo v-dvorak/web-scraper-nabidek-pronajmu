@@ -9,5 +9,5 @@ class BezrealitkyLocationImpl(ScraperLocationImpl):
 
     @property
     def scraper_type(self):
-        from ...scrapers import ScraperBezrealitky
+        from ...scrapers.impl import ScraperBezrealitky
         return ScraperBezrealitky

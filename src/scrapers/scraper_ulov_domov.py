@@ -7,7 +7,7 @@ from .rental_offer import RentalOffer
 from .scraper_base import ScraperBase
 from ..disposition import Disposition
 from ..location import LocationBase, UlovDomovLocationImpl
-
+from ..utils import find_number_in_str
 
 class ScraperUlovDomov(ScraperBase):
     name = "UlovDomov"
@@ -108,7 +108,7 @@ class ScraperUlovDomov(ScraperBase):
                 location=offer["street"]["label"] + ", " + offer["village"]["label"] + " - " + offer["village_part"][
                     "label"],
                 price=offer["price_rental"],
+                utilities=find_number_in_str(offer["price_note"]),
                 image_url=offer["photos"][0]["path"]
             ))
-
         return items

@@ -88,6 +88,7 @@ class ScraperEuroBydleni(ScraperBase):
                 title=title.get_text().strip(),
                 location=details[1].get_text().strip(),
                 price=int(re.sub(r"[^\d]", "", details[0].get_text()) or "0"),
+                utilities=None,
                 image_url="https:" + image_container.find("img").get("src")
             ))
 

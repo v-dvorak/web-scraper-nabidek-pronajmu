@@ -10,5 +10,5 @@ class SrealityLocationImpl(ScraperLocationImpl):
 
     @property
     def scraper_type(self):
-        from ...scrapers import ScraperSreality
+        from ...scrapers.impl import ScraperSreality
         return ScraperSreality

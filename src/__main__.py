@@ -9,17 +9,20 @@ from discord.ext import tasks
 from .config import *
 from .discord_logger import DiscordLogger
 from .offers_storage import OffersStorage
-from .scrapers import RentalOffer
 from .scrapers_manager import create_scrapers, fetch_latest_offers
+from .scrapers import RentalOffer
 
-def get_current_daytime() -> bool: return datetime.now().hour in range(6, 22)
+
+def get_current_daytime() -> bool:
+    return datetime.now().hour in range(6, 22)
 
 
 client = discord.Client(intents=discord.Intents.default())
 daytime = get_current_daytime()
 interval_time = config.refresh_interval_daytime_minutes if daytime else config.refresh_interval_nighttime_minutes
 
-scrapers = create_scrapers(config.dispositions)
+scrapers = create_scrapers(config.dispositions, config.location)
+
 
 @client.event
 async def on_ready():
@@ -48,7 +51,7 @@ async def process_latest_offers():
 
     new_offers: list[RentalOffer] = []
     for offer in fetch_latest_offers(scrapers):
-        if not storage.contains(offer):
+        if not storage.contains(offer) and offer.true_price <= config.maximal_rent_value:
             new_offers.append(offer)
 
     first_time = storage.first_time
@@ -63,11 +66,11 @@ async def process_latest_offers():
                 url=offer.link,
                 description=offer.location,
                 timestamp=datetime.utcnow(),
-                color=offer.scraper_type.color
+                color=offer.scraper.color
             )
 
             embed.add_field(name="Cena", value=str(offer.price) + " Kč")
-            embed.set_author(name=offer.scraper_type.name, icon_url=offer.scraper_type.logo_url)
+            embed.set_author(name=offer.scraper.name, icon_url=offer.scraper.logo_url)
             embed.set_image(url=offer.image_url)
 
             await channel.send(embed=embed)
@@ -89,24 +92,10 @@ async def process_latest_offers():
 
 if __name__ == "__main__":
     logging.basicConfig(
-        # level=(logging.DEBUG if config.debug else logging.INFO),
-        level=(logging.DEBUG),
+        level=(logging.DEBUG if config.debug else logging.INFO),
         format='%(asctime)s - [%(levelname)s] %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S')
 
     logging.debug("Running in debug mode")
-
-    from .location import BrnoLocation, PrahaLocation
-    from .scrapers import *
-    bl = BrnoLocation()
-    scp = ScraperBezrealitky([], bl)
-    print(bl(scp).location_id)
-    scp = ScraperRealingo(config.dispositions, BrnoLocation())
-    scp = ScraperRemax(config.dispositions, BrnoLocation())
-    scp = ScraperUlovDomov(config.dispositions, BrnoLocation())
-    # print(scp._LOCATION_ID)
-    for offer in scp.get_latest_offers():
-        print(offer.link)
-    exit()
 
     client.run(config.discord.token, log_level=logging.INFO)

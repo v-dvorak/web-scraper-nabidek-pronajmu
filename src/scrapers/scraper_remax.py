@@ -76,6 +76,7 @@ class ScraperRemax(ScraperBase):
                 title = item.get("data-title"),
                 location = re.sub(r"\s+", " ", item.get("data-display-address")),
                 price = int(re.sub(r"[^\d]", "", item.get("data-price")) or "0"),
+                utilities=None,
                 image_url = item.get("data-img")
             ))
 

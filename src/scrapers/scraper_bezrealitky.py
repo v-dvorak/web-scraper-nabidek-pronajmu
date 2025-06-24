@@ -6,14 +6,14 @@ import json
 from abc import ABC as abstract
 from typing import ClassVar
 
-from ..disposition import Disposition
-from ..scrapers import ScraperBase, RentalOffer
-from ..location import LocationBase
 import requests
+
+from ..disposition import Disposition
+from ..location import LocationBase
+from ..scrapers import ScraperBase, RentalOffer
 
 
 class ScraperBezrealitky(ScraperBase):
-
     name = "BezRealitky"
     logo_url = "https://www.bezrealitky.cz/manifest-icon-192.maskable.png"
     color = 0x00CC00
@@ -73,14 +73,18 @@ class ScraperBezrealitky(ScraperBase):
     def get_latest_offers(self) -> list[RentalOffer]:
         response = self.build_response().json()
 
-        return [  # type: list[RentalOffer]
-            RentalOffer(
-                scraper=self,
-                link=self._create_link_to_offer(item["uri"]),
-                title=item["imageAltText"],
-                location=item["address"],
-                price=f"{item['price']} / {item['charges']}",
-                image_url=item["mainImage"]["url"] if item["mainImage"] else "",
+        items: list[RentalOffer] = []
+
+        for item in response["data"]["listAdverts"]["list"]:
+            items.append(
+                RentalOffer(
+                    scraper=self,
+                    link=self._create_link_to_offer(item["uri"]),
+                    title=item["imageAltText"],
+                    location=item["address"],
+                    price=item["price"],
+                    utilities=item["charges"],
+                    image_url=item["mainImage"]["url"] if item["mainImage"] else "",
+                )
             )
-            for item in response["data"]["listAdverts"]["list"]
-        ]
+        return items

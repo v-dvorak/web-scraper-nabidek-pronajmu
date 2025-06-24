@@ -12,7 +12,7 @@ You can customize which **apartment layouts (dispositions)** and **city** to sea
 - EuroBydlení
 - iDNES Reality
 - REALCITY
-- realingo
+- Realingo
 - Remax
 - Sreality
 - UlovDomov
@@ -58,7 +58,7 @@ All variables are located inside the [`.env`](.env) file. The user should keep a
   DISPOSITIONS=2+kk,2+1,others
   ```
 
-You also need to invite you bot to your server, [adding bot a server tutorial](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links).
+You also need to invite your bot to the server, follow this [adding a bot to a server tutorial](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links).
 
 ### Supported Values for `DISPOSITIONS`
 

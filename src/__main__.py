@@ -51,7 +51,7 @@ async def process_latest_offers():
 
     new_offers: list[RentalOffer] = []
     for offer in fetch_latest_offers(scrapers):
-        if not storage.contains(offer) and offer.true_price <= config.maximal_rent_value:
+        if not storage.contains(offer) and offer.total_price <= config.maximal_rent_value:
             new_offers.append(offer)
 
     first_time = storage.first_time
@@ -62,14 +62,18 @@ async def process_latest_offers():
     if not first_time:
         for offer in new_offers:
             embed = discord.Embed(
-                title=offer.title,
+                title=offer.clean_title,
                 url=offer.link,
-                description=offer.location,
+                description=f"📍 {offer.location}",
                 timestamp=datetime.utcnow(),
                 color=offer.scraper.color
             )
 
-            embed.add_field(name="Cena", value=str(offer.price) + " Kč")
+            embed.add_field(name="Cena", value=f"{offer.price} Kč")
+            embed.add_field(name="Služby", value=f"{offer.true_utilities} Kč")
+            embed.add_field(name="Dispozice", value=f"{offer.disposition}")
+            embed.add_field(name="Velikost", value=f"{offer.disposition} m²")
+
             embed.set_author(name=offer.scraper.name, icon_url=offer.scraper.logo_url)
             embed.set_image(url=offer.image_url)
 

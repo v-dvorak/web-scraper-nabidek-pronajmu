@@ -15,7 +15,7 @@ from ..scrapers import ScraperBase, RentalOffer
 
 class ScraperBezrealitky(ScraperBase):
     name = "BezRealitky"
-    logo_url = "https://www.bezrealitky.cz/manifest-icon-192.maskable.png"
+    logo_url = "https://www.bezrealitky.cz/favicon.png"
     color = 0x00CC00
     base_url = "https://www.bezrealitky.cz"
     file: ClassVar[str] = "./graphql/bezrealitky.json"

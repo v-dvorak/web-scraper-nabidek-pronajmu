@@ -2,6 +2,7 @@
 .venv
 .vscode
 .env.local
+found_offers.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

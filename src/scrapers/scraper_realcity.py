@@ -4,17 +4,13 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from ..disposition import Disposition
 from .rental_offer import RentalOffer
 from .scraper_base import ScraperBase
+from ..disposition import Disposition
 from ..location import LocationBase
-
-import requests
-from bs4 import BeautifulSoup
 
 
 class ScraperRealcity(ScraperBase):
-
     name = "REALCITY"
     logo_url = "https://files.janchaloupka.cz/realcity.png"
     color = 0xB60D1C
@@ -27,9 +23,11 @@ class ScraperRealcity(ScraperBase):
         Disposition.FLAT_3KK: "%223%2Bkk%22",
         Disposition.FLAT_3: "%223%2B1%22",
         Disposition.FLAT_4KK: "%224%2Bkk%22",
-        Disposition.FLAT_4: ("%224%2B1%22", "%224%2B2%22"), # 4+1, 4+2
-        Disposition.FLAT_5_UP: ("%225%2Bkk%22", "%225%2B1%22", "%225%2B2%22", "%226%2Bkk%22", "%226%2B1%22", "%22disp_more%22"), # 5kk, 5+1, 5+2, 6kk, 6+1, ++
-        Disposition.FLAT_OTHERS: ("%22atyp%22", "%22disp_nospec%22"), # atyp, unknown
+        Disposition.FLAT_4: ("%224%2B1%22", "%224%2B2%22"),  # 4+1, 4+2
+        Disposition.FLAT_5_UP: (
+        "%225%2Bkk%22", "%225%2B1%22", "%225%2B2%22", "%226%2Bkk%22", "%226%2B1%22", "%22disp_more%22"),
+        # 5kk, 5+1, 5+2, 6kk, 6+1, ++
+        Disposition.FLAT_OTHERS: ("%22atyp%22", "%22disp_nospec%22"),  # atyp, unknown
     }
 
     def __init__(self, dispositions: Disposition, location: LocationBase):
@@ -43,10 +41,15 @@ class ScraperRealcity(ScraperBase):
 
         logging.debug("REALCITY request: %s", url)
 
-        return requests.get(url, headers=self.headers)
+        return self.get_wrapper(url, headers=self.headers)
 
     def get_latest_offers(self) -> list[RentalOffer]:
         response = self.build_response()
+
+        if response is None:
+            logging.info(f"{self.name}: No offers found")
+            return []
+
         soup = BeautifulSoup(response.text, 'html.parser')
 
         items: list[RentalOffer] = []

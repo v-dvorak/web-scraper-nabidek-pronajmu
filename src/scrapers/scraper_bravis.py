@@ -34,10 +34,15 @@ class ScraperBravis(ScraperBase):
 
         logging.debug("BRAVIS request: %s", url)
 
-        return requests.get(url, headers=self.headers)
+        return self.get_wrapper(url, headers=self.headers)
 
     def get_latest_offers(self) -> list[RentalOffer]:
         response = self.build_response()
+
+        if response is None:
+            logging.info(f"{self.name}: No offers found")
+            return []
+
         soup = BeautifulSoup(response.text, 'html.parser')
 
         items: list[RentalOffer] = []

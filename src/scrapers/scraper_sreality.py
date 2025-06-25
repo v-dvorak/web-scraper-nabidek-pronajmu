@@ -105,7 +105,7 @@ class ScraperSreality(ScraperBase):
                        "/" + offer["seo"]["locality"] +
                        "/" + str(offer["hash_id"]))
 
-    def build_response(self) -> requests.Response:
+    def build_response(self) -> requests.Response | None:
         url = self.base_url + "/api/cs/v2/estates?category_main_cb=1&category_sub_cb="
         url += "|".join(self.get_dispositions_data())
         url += (f"&category_type_cb=2&locality_district_id={self._LOCATION_DATA.locality_district_id}"
@@ -114,14 +114,23 @@ class ScraperSreality(ScraperBase):
 
         logging.debug("Sreality request: %s", url)
 
-        return requests.get(url, headers=self.headers)
+        return self.get_wrapper(url, headers=self.headers)
 
     def get_latest_offers(self) -> list[RentalOffer]:
         response = self.build_response().json()
 
+        try:
+            items_data = response["_embedded"]["estates"]
+            if not isinstance(items_data, list) or not items_data:
+                logging.info(f"{self.name}: No offers found")
+                return []
+        except (TypeError, KeyError):
+            logging.error(f"{self.name}: Unexpected response structure")
+            return []
+
         items: list[RentalOffer] = []
 
-        for item in response["_embedded"]["estates"]:
+        for item in items_data:
             # Ignorovat "tip" nabídky, které úplně neodpovídají filtrům a mění se s každým vyhledáváním
             if item["region_tip"] > 0:
                 continue

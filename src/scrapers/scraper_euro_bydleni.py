@@ -65,12 +65,17 @@ class ScraperEuroBydleni(ScraperBase):
 
         logging.debug("EuroBydlení request: %s", json.dumps(request_data))
 
-        response = requests.post(self.base_url, headers=self.headers, cookies=self.cookies, data=request_data)
+        response = self.post_wrapper(self.base_url, headers=self.headers, cookies=self.cookies, data=request_data)
         response.encoding = "utf-8"
         return response
 
     def get_latest_offers(self) -> list[RentalOffer]:
         response = self.build_response()
+
+        if response is None:
+            logging.info(f"{self.name}: No offers found")
+            return []
+
         soup = BeautifulSoup(response.text, 'html.parser')
 
         items: list[RentalOffer] = []

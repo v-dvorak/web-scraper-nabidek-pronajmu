@@ -3,6 +3,7 @@ author: Mark Barzali
 """
 
 import json
+import logging
 from abc import ABC as abstract
 from typing import ClassVar
 
@@ -65,7 +66,7 @@ class ScraperBezrealitky(ScraperBase):
         return f"{ScraperBezrealitky.base_url}/{ScraperBezrealitky.Routes.OFFERS}{item}"
 
     def build_response(self) -> requests.Response:
-        return requests.post(
+        return self.post_wrapper(
             url=f"{ScraperBezrealitky.API}{ScraperBezrealitky.Routes.GRAPHQL}",
             json=self._config
         )
@@ -73,9 +74,18 @@ class ScraperBezrealitky(ScraperBase):
     def get_latest_offers(self) -> list[RentalOffer]:
         response = self.build_response().json()
 
+        try:
+            items_data = response["data"]["listAdverts"]["list"]
+            if not isinstance(items_data, list) or not items_data:
+                logging.info(f"{self.name}: No offers found")
+                return []
+        except (TypeError, KeyError):
+            logging.error(f"{self.name}: Unexpected response structure")
+            return []
+
         items: list[RentalOffer] = []
 
-        for item in response["data"]["listAdverts"]["list"]:
+        for item in items_data:
             items.append(
                 RentalOffer(
                     scraper=self,

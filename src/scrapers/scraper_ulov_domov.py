@@ -9,6 +9,7 @@ from ..disposition import Disposition
 from ..location import LocationBase, UlovDomovLocationImpl
 from ..utils import find_number_in_str
 
+
 class ScraperUlovDomov(ScraperBase):
     name = "UlovDomov"
     logo_url = "https://www.ulovdomov.cz/favicon.png"
@@ -60,7 +61,7 @@ class ScraperUlovDomov(ScraperBase):
             "5_and_more": "5 a více"
         }.get(id, "")
 
-    def build_response(self) -> requests.Response:
+    def build_response(self) -> requests.Response | None:
         json_request = {
             "acreage_from": "",
             "acreage_to": "",
@@ -92,13 +93,22 @@ class ScraperUlovDomov(ScraperBase):
 
         logging.debug("UlovDomov request: %s", json.dumps(json_request))
 
-        return requests.post(self.base_url, headers=self.headers, json=json_request)
+        return self.post_wrapper(self.base_url, self.headers, json_request)
 
     def get_latest_offers(self) -> list[RentalOffer]:
         response = self.build_response().json()
 
+        try:
+            items_data = response["offers"]
+            if not isinstance(items_data, list) or not items_data:
+                logging.info(f"{self.name}: No offers found")
+                return []
+        except (TypeError, KeyError):
+            logging.error(f"{self.name}: Unexpected response structure")
+            return []
+
         items: list[RentalOffer] = []
-        for offer in response["offers"]:
+        for offer in items_data:
             items.append(RentalOffer(
                 scraper=self,
                 link=offer["absolute_url"],
